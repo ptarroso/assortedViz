@@ -28,21 +28,26 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
   plot.window(c(0, 1), c(0, 1), asp = 1)
 
   for (i in 1:nrow(ct)) {
-    x1mask <- x1.s >= ct[i, 1] - hs & x1.s < ct[i, 1] + hs
-    x2mask <- x2.s >= ct[i, 1] - hs & x2.s < ct[i, 1] + hs
-    ymask <- y.s >= ct[i, 2] - hs & y.s < ct[i, 2] + hs
+    minx <- ct[i, 1] - hs
+    maxx <- ct[i, 1] + hs
+    miny <- ct[i, 2] - hs
+    maxy <- ct[i, 2] + hs
+
+    x1mask <- x1.s >= minx & x1.s < maxx
+    x2mask <- x2.s >= minx & x2.s < maxx
+    ymask <- y.s >= miny & y.s < maxy
     pntx1 <- FUN(z[x1mask & ymask])
     pntx2 <- FUN(z[x2mask & ymask])
 
     if (!is.na(pntx1) | displayNA) {
-      polygon(x = c(rep(ct[i, 1] - hs * ps, 2), ct[i, 1] + hs * ps),
-              y = c(ct[i, 2] + hs * ps, rep(ct[i, 2] - hs * ps, 2)),
+      polygon(x = c(rep(minx * ps, 2), maxx * ps),
+              y = c(maxy * ps, rep(miny * ps, 2)),
               col = .tricolor(pntx1, col.FUN, breaks), ...)
     }
 
     if (!is.na(pntx2) | displayNA) {
-      polygon(x = c(ct[i, 1] - hs * ps, rep(ct[i, 1] + hs * ps, 2)),
-              y = c(rep(ct[i, 2] + hs * ps, 2), ct[i, 2] - hs * ps),
+      polygon(x = c(minx * ps, rep(maxx * ps, 2)),
+              y = c(rep(maxy * ps, 2), miny * ps),
               col = .tricolor(pntx2, col.FUN, breaks), ...)
     }
   }
