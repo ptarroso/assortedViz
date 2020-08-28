@@ -1,14 +1,14 @@
 .tricolor <- function(x, col.FUN, breaks) {
-  value <- cut(x, breaks)
+  value <- cut(x, breaks, include.lowest=TRUE)
   col.FUN(length(levels(value)))[as.integer(value)]
 }
 
 triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors,
   breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL,
-  y.lab = y.at, displayNA = TRUE, axis.labels = NULL, ...) {
+  y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale=TRUE, ...) {
 
   if (length(breaks) == 1) {
-    breaks <- seq(min(z), max(z), length.out = breaks)
+    breaks <- seq(min(z, na.rm=T), max(z, na.rm=T), length.out = breaks)
   }
 
   hs <- size/2
@@ -23,6 +23,25 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
   x1.s <- (x1 - vals[1, 1])/vals[1, 2]
   x2.s <- (x2 - vals[2, 1])/vals[2, 2]
   y.s <- (y - vals[3, 1])/vals[3, 2]
+
+  op <- par()
+
+  if (scale) {
+    n <- 100
+    scl.z <- seq(min(z, na.rm=T), max(z, na.rm=T), length.out=n)
+    scl.col <- .tricolor(scl.z, col.FUN, breaks)
+    layout(matrix(2:1), heights=c(1, 0.25))
+    par(mar=rep(3, 4))
+    plot.new()
+    plot.window(range(z, na.rm=T), c(0,1))
+    par(usr=c(min(z, na.rm=T), max(z, na.rm=T), 0, 1))
+    image(scl.z, 1, matrix(scl.z, ncol=1), col=scl.col, add=T)
+    axis(1, at=seq(min(z, na.rm=T), max(z, na.rm=T), diff(range(z, na.rm=T)/5)))
+    box()
+    if (length(axis.labels)==4) {
+      mtext(axis.labels[4], 3, 0)
+    }
+  }
 
   plot.new()
   plot.window(c(0, 1), c(0, 1), asp = 1)
