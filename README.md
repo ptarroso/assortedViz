@@ -12,7 +12,7 @@ magic (issues, cloning, patches, etc). Meanwhile, I hope it is useful!
 
 There are several option to install *assortedViz*:
 
-- To install the current released version found [here](), you need to
+- To install the current released version found [here](https://github.com/ptarroso/assortedViz/releases/tag/v1.0), you need to
   download the built *tar.gz* package file and install it.
 
 - Clone the repository with *git* and build the package in your computer.
