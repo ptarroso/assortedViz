@@ -5,7 +5,8 @@
 
 triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors,
   breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL,
-  y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale=TRUE, ...) {
+  y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale=TRUE, scale.at=NULL,
+  scale.lab=scale.at, ...) {
 
   if (length(breaks) == 1) {
     breaks <- seq(min(z, na.rm=T), max(z, na.rm=T), length.out = breaks)
@@ -36,10 +37,15 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
     plot.window(range(z, na.rm=T), c(0,1))
     par(usr=c(min(z, na.rm=T), max(z, na.rm=T), 0, 1))
     image(scl.z, 1, matrix(scl.z, ncol=1), col=scl.col, add=T)
-    axis(1, at=seq(min(z, na.rm=T), max(z, na.rm=T), diff(range(z, na.rm=T)/5)))
     box()
+
+    if (is.null(scale.at)) {
+      # Place 5 labels (including min and max) equally spaced in scale bar
+      scale.at = seq(min(z, na.rm=T), max(z, na.rm=T), diff(range(z, na.rm=T)/5))
+    }
+    axis(1, at=scale.at, labels=scale.lab)
     if (length(axis.labels)==4) {
-      mtext(axis.labels[4], 3, 0)
+        mtext(axis.labels[4], 3, 0)
     }
   }
 

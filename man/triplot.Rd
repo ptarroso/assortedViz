@@ -13,7 +13,7 @@
 	variable.
 }
 \usage{
-triplot(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors, breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale = TRUE, ...)
+triplot(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors, breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale = TRUE, scale.at=NULL, scale.lab=scale.at, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -71,6 +71,12 @@ triplot(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors, br
 }
 	\item{scale}{
 	Add a color scale bar for Z values? If TRUE, than a multiplot is created with a scale bar on bottom.
+}
+	\item{scale.at}{
+Position of tick marks on scale bar (if null - default - five equally spaced labels are added).
+}
+	\item{scale}{
+Labels for each tick mark in the scale bar.
 }
   \item{\dots}{
 	Additional arguments for plotting.
