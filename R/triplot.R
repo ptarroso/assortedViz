@@ -76,13 +76,27 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
               col = .tricolor(pntx2, col.FUN, breaks), ...)
     }
   }
-  if (!is.null(x1.at)) {
+
+  # NA prevents labels being displayed; NULL add 'pretty' labels.
+  # The NA test is not particularly correct wit side effect no NAs on axis.at.
+  if (is.null(x1.at)) {
+    x1.at <- seq(min(x1, na.rm=T), max(x1, na.rm=T), diff(range(x1, na.rm=T)/5))
+  }
+  if (!anyNA(x1.at)) {
     axis(1, at = (x1.at - vals[1, 1])/vals[1, 2], labels = x1.lab, pos = 0)
   }
-  if (!is.null(x2.at)) {
+
+  if (is.null(x2.at)) {
+    x2.at <- seq(min(x2, na.rm=T), max(x2, na.rm=T), diff(range(x2, na.rm=T)/5))
+  }
+  if (!anyNA(x2.at)) {
     axis(3, at = (x2.at - vals[2, 1])/vals[2, 2], labels = x2.lab, pos = 1)
   }
-  if (!is.null(y.at)) {
+
+  if (is.null(y.at)) {
+    y.at <- seq(min(y, na.rm=T), max(y, na.rm=T), diff(range(y, na.rm=T)/5))
+  }
+  if (!anyNA(y.at)) {
     axis(2, at = (y.at - vals[3, 1])/vals[3, 2], labels = y.lab, pos = 0)
   }
 
