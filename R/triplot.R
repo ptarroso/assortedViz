@@ -3,10 +3,10 @@
   col.FUN(length(levels(value)))[as.integer(value)]
 }
 
-triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors,
-  breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL,
-  y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale=TRUE, scale.at=NULL,
-  scale.lab=scale.at, ...) {
+triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
+  col.FUN = hcl.colors, breaks = 100, x1.at = NULL, x1.lab = x1.at,
+  x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE,
+  axis.labels = NULL, scale=TRUE, scale.at=NULL, scale.lab=scale.at, ...) {
 
   if (length(breaks) == 1) {
     breaks <- seq(min(z, na.rm=T), max(z, na.rm=T), length.out = breaks)
@@ -41,7 +41,9 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
 
     if (is.null(scale.at)) {
       # Place 5 labels (including min and max) equally spaced in scale bar
-      scale.at = seq(min(z, na.rm=T), max(z, na.rm=T), diff(range(z, na.rm=T)/5))
+      scale.at <- seq(min(z, na.rm=T), max(z, na.rm=T),
+                      diff(range(z, na.rm=T)/5))
+      scale.at <- round(scale.at, floor(2.5/log1p(diff(range(scale.at)))))
     }
     axis(1, at=scale.at, labels=scale.lab)
     if (length(axis.labels)==4) {
@@ -81,6 +83,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
   # The NA test is not particularly correct wit side effect no NAs on axis.at.
   if (is.null(x1.at)) {
     x1.at <- seq(min(x1, na.rm=T), max(x1, na.rm=T), diff(range(x1, na.rm=T)/5))
+    x1.at <- round(x1.at, floor(2.5/log1p(diff(range(x1.at)))))
   }
   if (!anyNA(x1.at)) {
     axis(1, at = (x1.at - vals[1, 1])/vals[1, 2], labels = x1.lab, pos = 0)
@@ -88,6 +91,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
 
   if (is.null(x2.at)) {
     x2.at <- seq(min(x2, na.rm=T), max(x2, na.rm=T), diff(range(x2, na.rm=T)/5))
+    x2.at <- round(x2.at, floor(2.5/log1p(diff(range(x2.at)))))
   }
   if (!anyNA(x2.at)) {
     axis(3, at = (x2.at - vals[2, 1])/vals[2, 2], labels = x2.lab, pos = 1)
@@ -95,6 +99,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hc
 
   if (is.null(y.at)) {
     y.at <- seq(min(y, na.rm=T), max(y, na.rm=T), diff(range(y, na.rm=T)/5))
+    y.at <- round(y.at, floor(2.5/log1p(diff(range(y.at)))))
   }
   if (!anyNA(y.at)) {
     axis(2, at = (y.at - vals[3, 1])/vals[3, 2], labels = y.lab, pos = 0)
