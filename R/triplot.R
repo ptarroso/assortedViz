@@ -25,6 +25,13 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   x2.s <- (x2 - vals[2, 1])/vals[2, 2]
   y.s <- (y - vals[3, 1])/vals[3, 2]
 
+  # Prepare grid on original coordinates to return
+  ct.o <- matrix(NA, nrow(ct), 3)
+  colnames(ct.o) <- c("x1", "x2", "y")
+  ct.o[,1] <- ct[,1] * vals[1,2] + vals[1,1]
+  ct.o[,2] <- ct[,1] * vals[2,2] + vals[2,1]
+  ct.o[,3] <- ct[,2] * vals[3,2] + vals[3,1]
+
   op <- par()
 
   if (scale) {
@@ -54,6 +61,10 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   plot.new()
   plot.window(c(0, 1), c(0, 1), asp = 1)
 
+  # Prepara a table of values to return
+  tri <- matrix(NA, nrow(ct), 2)
+  colnames(tri) <- c("x1.y", "x2.y")
+
   for (i in 1:nrow(ct)) {
     minx <- ct[i, 1] - hs
     maxx <- ct[i, 1] + hs
@@ -63,19 +74,19 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
     x1mask <- x1.s >= minx & x1.s < maxx
     x2mask <- x2.s >= minx & x2.s < maxx
     ymask <- y.s >= miny & y.s < maxy
-    pntx1 <- FUN(z[x1mask & ymask])
-    pntx2 <- FUN(z[x2mask & ymask])
+    tri[i,1] <- FUN(z[x1mask & ymask])
+    tri[i,2] <- FUN(z[x2mask & ymask])
 
-    if (!is.na(pntx1) | displayNA) {
+    if (!is.na(tri[i,1]) | displayNA) {
       polygon(x = c(rep(minx * ps, 2), maxx * ps),
               y = c(maxy * ps, rep(miny * ps, 2)),
-              col = .tricolor(pntx1, col.FUN, breaks), ...)
+              col = .tricolor(tri[i,1], col.FUN, breaks), ...)
     }
 
-    if (!is.na(pntx2) | displayNA) {
+    if (!is.na(tri[i,2]) | displayNA) {
       polygon(x = c(minx * ps, rep(maxx * ps, 2)),
               y = c(rep(maxy * ps, 2), miny * ps),
-              col = .tricolor(pntx2, col.FUN, breaks), ...)
+              col = .tricolor(tri[i,2], col.FUN, breaks), ...)
     }
   }
 
@@ -111,4 +122,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
     mtext(axis.labels[3], 2, 1)
   }
   rect(0, 0, 1, 1)
+
+  # Returns data if user wants to collect it
+  tri <- list(tri=tri, original.crd=ct.o, plot.crd=ct)
 }

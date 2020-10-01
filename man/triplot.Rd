@@ -101,6 +101,17 @@ Labels for each tick mark in the scale bar.
 }
 \value{
 	A plot!
+
+	If the function is redirected to a variable 'dt <- triplot(...)' it
+	returns a list with 3 items:
+
+	1. tri - the value of the triangle in respect to x1 vs. y and x2 vs. y.
+
+	2. original.crd - a 3 column matrix with real values for the plot grid for
+	            each of the varaibles.
+
+	3. plot.crd - a 2 column table with grid values on the plot coordinates (from
+	            zero to one). Since x1 = x2 in this case, only x is reported.
 }
 \references{
 	(recursive reference)
