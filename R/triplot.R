@@ -32,30 +32,9 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   ct.o[,2] <- ct[,1] * vals[2,2] + vals[2,1]
   ct.o[,3] <- ct[,2] * vals[3,2] + vals[3,1]
 
-  op <- par()
-
   if (scale) {
-    n <- 100
-    scl.z <- seq(min(z, na.rm=T), max(z, na.rm=T), length.out=n)
-    scl.col <- .tricolor(scl.z, col.FUN, breaks)
-    layout(matrix(2:1), heights=c(1, 0.25))
-    par(mar=rep(3, 4))
-    plot.new()
-    plot.window(range(z, na.rm=T), c(0,1))
-    par(usr=c(min(z, na.rm=T), max(z, na.rm=T), 0, 1))
-    image(scl.z, 1, matrix(scl.z, ncol=1), col=scl.col, add=T)
-    box()
-
-    if (is.null(scale.at)) {
-      # Place 5 labels (including min and max) equally spaced in scale bar
-      scale.at <- seq(min(z, na.rm=T), max(z, na.rm=T),
-                      diff(range(z, na.rm=T)/5))
-      scale.at <- round(scale.at, floor(2.5/log1p(diff(range(scale.at)))))
-    }
-    axis(1, at=scale.at, labels=scale.lab)
-    if (length(axis.labels)==4) {
-        mtext(axis.labels[4], 3, 0)
-    }
+    # divide the plot in two areas for displaying z color scale
+    layout(matrix(1:2), heights=c(1, 0.25))
   }
 
   plot.new()
@@ -122,6 +101,33 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
     mtext(axis.labels[3], 2, 1)
   }
   rect(0, 0, 1, 1)
+
+  if (scale) {
+    n <- 100 # Pass this as a function argument?
+    # scale only displays values in the plot after FUN, not original z range.
+    scl.z <- seq(min(tri, na.rm=T), max(tri, na.rm=T), length.out=n)
+    scl.col <- .tricolor(scl.z, col.FUN, breaks)
+    op <- par(mar=rep(3, 4), "mfg", "usr", "xaxp", "yaxp")
+    plot.new()
+    plot.window(range(z, na.rm=T), c(0,1))
+    par(usr=c(min(z, na.rm=T), max(z, na.rm=T), 0, 1))
+    image(scl.z, 1, matrix(scl.z, ncol=1), col=scl.col, add=T)
+    box()
+
+    if (is.null(scale.at)) {
+      # Place 5 labels (including min and max) equally spaced in scale bar
+      scale.at <- seq(min(z, na.rm=T), max(z, na.rm=T),
+                      diff(range(z, na.rm=T)/5))
+      scale.at <- round(scale.at, floor(2.5/log1p(diff(range(scale.at)))))
+    }
+    axis(1, at=scale.at, labels=scale.lab)
+    if (length(axis.labels)==4) {
+        mtext(axis.labels[4], 3, 0)
+    }
+
+    # Forces to return to 1st plot for simplifing adding additional items later
+    par(op)
+  }
 
   # Returns data if user wants to collect it
   tri <- list(tri=tri, original.crd=ct.o, plot.crd=ct)
