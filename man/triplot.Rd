@@ -13,7 +13,7 @@
 	variable.
 }
 \usage{
-triplot(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors, breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale = TRUE, scale.at=NULL, scale.lab=scale.at, ...)
+triplot(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean, col.FUN = hcl.colors, breaks = 100, x1.at = NULL, x1.lab = x1.at, x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE, axis.labels = NULL, scale = TRUE, scale.at=NULL, scale.lab=scale.at, verbose=TRUE, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -78,6 +78,10 @@ Position of tick marks on scale bar (if null - default - five equally spaced lab
 	\item{scale}{
 Labels for each tick mark in the scale bar.
 }
+	\item{verbose}{
+If TRUE (default) it displays a progress bar during calculations.
+}
+
   \item{\dots}{
 	Additional arguments for plotting.
 }

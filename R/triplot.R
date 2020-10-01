@@ -3,10 +3,23 @@
   col.FUN(length(levels(value)))[as.integer(value)]
 }
 
+.progressBar <- function(i, total, size=60) {
+  bar.size <- size - 7
+  p <- floor(i / total * 100)
+  if (p <= 100){
+    char.pos <- floor(p * bar.size / 100)
+    txt <- paste(c("|", rep("-", char.pos), rep(" ", bar.size-char.pos), "| ",
+                 p, "%\r"), collapse ="")
+    cat(txt)
+  }
+  if (p == 100) cat("\n")
+}
+
 triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   col.FUN = hcl.colors, breaks = 100, x1.at = NULL, x1.lab = x1.at,
   x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE,
-  axis.labels = NULL, scale=TRUE, scale.at=NULL, scale.lab=scale.at, ...) {
+  axis.labels = NULL, scale=TRUE, scale.at=NULL, scale.lab=scale.at,
+  verbose=TRUE, ...) {
 
   hs <- size/2
 
@@ -53,6 +66,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
     tri[i,1] <- FUN(z[x1mask & ymask])
     tri[i,2] <- FUN(z[x2mask & ymask])
     tri[i,3:6] <- c(minx, maxx, miny, maxy)
+    if (verbose) .progressBar(i, nrow(ct))
   }
 
   rng.z <- range(tri, na.rm=T)
