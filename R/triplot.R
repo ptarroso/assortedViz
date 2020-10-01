@@ -8,10 +8,6 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   x2.at = NULL, x2.lab = x2.at, y.at = NULL, y.lab = y.at, displayNA = TRUE,
   axis.labels = NULL, scale=TRUE, scale.at=NULL, scale.lab=scale.at, ...) {
 
-  if (length(breaks) == 1) {
-    breaks <- seq(min(z, na.rm=T), max(z, na.rm=T), length.out = breaks)
-  }
-
   hs <- size/2
 
   ct <- expand.grid(x = seq(size/2, 1 - size/2, size),
@@ -40,10 +36,11 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   plot.new()
   plot.window(c(0, 1), c(0, 1), asp = 1)
 
-  # Prepara a table of values to return
-  tri <- matrix(NA, nrow(ct), 2)
-  colnames(tri) <- c("x1.y", "x2.y")
+  # Prepara a table of triangle values to display and return
+  tri <- matrix(NA, nrow(ct), 6)
+  colnames(tri) <- c("x1.y", "x2.y", "minx", "maxx", "miny", "maxy")
 
+  #TODO: speed up this loop
   for (i in 1:nrow(ct)) {
     minx <- ct[i, 1] - hs
     maxx <- ct[i, 1] + hs
@@ -55,16 +52,26 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
     ymask <- y.s >= miny & y.s < maxy
     tri[i,1] <- FUN(z[x1mask & ymask])
     tri[i,2] <- FUN(z[x2mask & ymask])
+    tri[i,3:6] <- c(minx, maxx, miny, maxy)
+  }
 
+  rng.z <- range(tri, na.rm=T)
+  # Prepare breaks for z, if only integer is given
+  if (length(breaks) == 1) {
+    breaks <- seq(rng.z[1], rng.z[2], length.out = breaks)
+  }
+
+  # Plot triangles
+  for (i in 1:nrow(ct)) {
     if (!is.na(tri[i,1]) | displayNA) {
-      polygon(x = c(rep(minx * ps, 2), maxx * ps),
-              y = c(maxy * ps, rep(miny * ps, 2)),
-              col = .tricolor(tri[i,1], col.FUN, breaks), ...)
+        polygon(x = c(rep(tri[i,3] * ps, 2), tri[i,4] * ps),
+                y = c(tri[i,6] * ps, rep(tri[i,5] * ps, 2)),
+                col = .tricolor(tri[i,1], col.FUN, breaks), ...)
     }
 
     if (!is.na(tri[i,2]) | displayNA) {
-      polygon(x = c(minx * ps, rep(maxx * ps, 2)),
-              y = c(rep(maxy * ps, 2), miny * ps),
+      polygon(x = c(tri[i,3] * ps, rep(tri[i,4] * ps, 2)),
+              y = c(rep(tri[i,6] * ps, 2), tri[i,5] * ps),
               col = .tricolor(tri[i,2], col.FUN, breaks), ...)
     }
   }
@@ -72,7 +79,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   # NA prevents labels being displayed; NULL add 'pretty' labels.
   # The NA test is not particularly correct wit side effect no NAs on axis.at.
   if (is.null(x1.at)) {
-    x1.at <- seq(min(x1, na.rm=T), max(x1, na.rm=T), diff(range(x1, na.rm=T)/5))
+    x1.at <- seq(min(x1, na.rm=T), max(x1, na.rm=T), diff(range(x1, na.rm=T))/5)
     x1.at <- round(x1.at, floor(2.5/log1p(diff(range(x1.at)))))
   }
   if (!anyNA(x1.at)) {
@@ -80,7 +87,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   }
 
   if (is.null(x2.at)) {
-    x2.at <- seq(min(x2, na.rm=T), max(x2, na.rm=T), diff(range(x2, na.rm=T)/5))
+    x2.at <- seq(min(x2, na.rm=T), max(x2, na.rm=T), diff(range(x2, na.rm=T))/5)
     x2.at <- round(x2.at, floor(2.5/log1p(diff(range(x2.at)))))
   }
   if (!anyNA(x2.at)) {
@@ -88,7 +95,7 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   }
 
   if (is.null(y.at)) {
-    y.at <- seq(min(y, na.rm=T), max(y, na.rm=T), diff(range(y, na.rm=T)/5))
+    y.at <- seq(min(y, na.rm=T), max(y, na.rm=T), diff(range(y, na.rm=T))/5)
     y.at <- round(y.at, floor(2.5/log1p(diff(range(y.at)))))
   }
   if (!anyNA(y.at)) {
@@ -105,19 +112,18 @@ triplot <- function(x1, x2, y, z, size = 0.025, ps = 1, FUN = mean,
   if (scale) {
     n <- 100 # Pass this as a function argument?
     # scale only displays values in the plot after FUN, not original z range.
-    scl.z <- seq(min(tri, na.rm=T), max(tri, na.rm=T), length.out=n)
+    scl.z <- seq(rng.z[1], rng.z[2], length.out=n)
     scl.col <- .tricolor(scl.z, col.FUN, breaks)
     op <- par(mar=rep(3, 4), "mfg", "usr", "xaxp", "yaxp")
     plot.new()
-    plot.window(range(z, na.rm=T), c(0,1))
-    par(usr=c(min(z, na.rm=T), max(z, na.rm=T), 0, 1))
+    plot.window(rng.z, c(0,1))
+    par(usr=c(rng.z, 0, 1))
     image(scl.z, 1, matrix(scl.z, ncol=1), col=scl.col, add=T)
     box()
 
     if (is.null(scale.at)) {
       # Place 5 labels (including min and max) equally spaced in scale bar
-      scale.at <- seq(min(z, na.rm=T), max(z, na.rm=T),
-                      diff(range(z, na.rm=T)/5))
+      scale.at <- seq(rng.z[1], rng.z[2], diff(rng.z)/5)
       scale.at <- round(scale.at, floor(2.5/log1p(diff(range(scale.at)))))
     }
     axis(1, at=scale.at, labels=scale.lab)
